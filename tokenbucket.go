@@ -46,7 +46,7 @@ func (t *TokenBucket) Dump() {
 // Take() returns the time to wait before tokens are available
 //  Calling Take commits to take them, cant be put back
 func (t *TokenBucket) Take(icount int64) time.Duration {
-count := float64(icount)
+	count := float64(icount)
 	now := time.Now()
 	t.lock.Lock()
 	t.lastCount += float64(now.Sub(t.lastCheckTime).Nanoseconds()) / float64(t.fillInterval.Nanoseconds())
@@ -68,7 +68,7 @@ count := float64(icount)
 // which could be immediately if enough tokens are available.
 //  Wait() reserves tokens in spite of waiting for possession
 func (t *TokenBucket) Wait(icount int64) {
-count := float64(icount)
+	count := float64(icount)
 	t.lock.Lock()
 	now := time.Now()
 	t.lastCount += float64(now.Sub(t.lastCheckTime).Nanoseconds()) / float64(t.fillInterval.Nanoseconds())
