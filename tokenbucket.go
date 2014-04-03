@@ -57,7 +57,7 @@ func (t *TokenBucket) Take(count int64) time.Duration {
 	var delay time.Duration
 	if t.lastCount <= 0 {
 		delay = time.Duration(-t.lastCount * t.fillInterval.Nanoseconds())
-		fmt.Printf("Delay = %v\n",delay)
+		//fmt.Printf("Take Delay = %v\n",delay)
 	}
 	t.lock.Unlock()
 	return delay
@@ -67,7 +67,7 @@ func (t *TokenBucket) Take(count int64) time.Duration {
 // which could be immediately if enough tokens are available.
 //  Wait() reserves tokens in spite of waiting for possession
 func (t *TokenBucket) Wait(count int64) {
-	t.lock.Lock() 
+	t.lock.Lock()
 	now := time.Now()
 	t.lastCount += now.Sub(t.lastCheckTime).Nanoseconds() / t.fillInterval.Nanoseconds()
 	t.lastCheckTime = now
@@ -81,6 +81,6 @@ func (t *TokenBucket) Wait(count int64) {
 	}
 	delay := time.Duration(-t.lastCount * t.fillInterval.Nanoseconds())
 	t.lock.Unlock()
-	fmt.Printf("Wait delay = %v\n", delay)
+	//fmt.Printf("Wait delay = %v\n", delay)
 	time.Sleep(delay)
 }
