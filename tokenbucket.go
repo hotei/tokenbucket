@@ -1,7 +1,7 @@
 // tokenbucket.go (c) 2014 David Rook - all rights reserved
 //
 // see http://en.wikipedia.org/wiki/Token_bucket
-//  This is a "clean-room" implementation of the API at http://godoc.org/github.com/juju/ratelimit
+//  This was once similar to the API at http://godoc.org/github.com/juju/ratelimit
 package tokenbucket
 
 import (
@@ -13,13 +13,13 @@ import (
 
 type TokenBucket struct {
 	fillInterval  time.Duration
-	capacity      int64
-	lastCount     int64
+	capacity      float64
+	lastCount     float64
 	lastCheckTime time.Time
 	lock          sync.Mutex
 }
 
-func New(fillTime time.Duration, capacity int64) *TokenBucket {
+func New(fillTime time.Duration, capacity float64) *TokenBucket {
 	if fillTime.Nanoseconds() <= int64(0) {
 		log.Fatalf("arguments to tokenbucket.New() must be positive\n")
 	}
@@ -45,10 +45,11 @@ func (t *TokenBucket) Dump() {
 
 // Take() returns the time to wait before tokens are available
 //  Calling Take commits to take them, cant be put back
-func (t *TokenBucket) Take(count int64) time.Duration {
-	t.lock.Lock()
+func (t *TokenBucket) Take(icount int64) time.Duration {
+count := float64(icount)
 	now := time.Now()
-	t.lastCount += now.Sub(t.lastCheckTime).Nanoseconds() / t.fillInterval.Nanoseconds()
+	t.lock.Lock()
+	t.lastCount += float64(now.Sub(t.lastCheckTime).Nanoseconds()) / float64(t.fillInterval.Nanoseconds())
 	t.lastCheckTime = now
 	if t.lastCount > t.capacity {
 		t.lastCount = t.capacity
@@ -56,7 +57,7 @@ func (t *TokenBucket) Take(count int64) time.Duration {
 	t.lastCount -= count
 	var delay time.Duration
 	if t.lastCount <= 0 {
-		delay = time.Duration(-t.lastCount * t.fillInterval.Nanoseconds())
+		delay = time.Duration(-t.lastCount * float64(t.fillInterval.Nanoseconds()))
 		//fmt.Printf("Take Delay = %v\n",delay)
 	}
 	t.lock.Unlock()
@@ -66,10 +67,11 @@ func (t *TokenBucket) Take(count int64) time.Duration {
 // Wait() blocks until at least count tokens are available then returns -
 // which could be immediately if enough tokens are available.
 //  Wait() reserves tokens in spite of waiting for possession
-func (t *TokenBucket) Wait(count int64) {
+func (t *TokenBucket) Wait(icount int64) {
+count := float64(icount)
 	t.lock.Lock()
 	now := time.Now()
-	t.lastCount += now.Sub(t.lastCheckTime).Nanoseconds() / t.fillInterval.Nanoseconds()
+	t.lastCount += float64(now.Sub(t.lastCheckTime).Nanoseconds()) / float64(t.fillInterval.Nanoseconds())
 	t.lastCheckTime = now
 	if t.lastCount > t.capacity {
 		t.lastCount = t.capacity
@@ -79,7 +81,7 @@ func (t *TokenBucket) Wait(count int64) {
 		t.lock.Unlock()
 		return
 	}
-	delay := time.Duration(-t.lastCount * t.fillInterval.Nanoseconds())
+	delay := time.Duration(-t.lastCount * float64(t.fillInterval.Nanoseconds()))
 	t.lock.Unlock()
 	//fmt.Printf("Wait delay = %v\n", delay)
 	time.Sleep(delay)

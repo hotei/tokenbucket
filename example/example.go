@@ -35,7 +35,7 @@ func main() {
 				fmt.Printf("gort[%d] %d \n",id, iter)
 				hist[id]++
 				iter++
-				if iter > 1000 { 
+				if iter > 10000 { 
 					lok.Unlock()
 					break 
 				}
