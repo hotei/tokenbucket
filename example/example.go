@@ -16,7 +16,12 @@ var hist map[int]int
 
 func main() {
 	hist := make(map[int]int)
-	tok := tokenbucket.New(time.Millisecond*1, 1) // add 1000 tokens per second
+	// add rate is 1000 tokens per second, max of 10
+	tok := tokenbucket.New(time.Millisecond*1, 10)
+	if false {
+		tok.Take(10) // start with empty bucket
+	}
+	fmt.Printf("Fill Rate is %g per second\n", tok.FillRate())
 	startTime := time.Now()
 	iter := 0
 	var wg sync.WaitGroup
