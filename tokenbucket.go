@@ -39,7 +39,7 @@ func New(fillTime time.Duration, capacity float64) *TokenBucket {
 
 func (t *TokenBucket) dump() {
 	t.lock.Lock()
-	fmt.Printf("Interval[%v] Cap[%d] lastCount[%d] lastCheckTime[%v]\n",
+	fmt.Printf("Interval[%v] Cap[%g] lastCount[%g] lastCheckTime[%v]\n",
 		t.fillInterval, t.capacity, t.lastCount, t.lastCheckTime)
 	t.lock.Unlock()
 }
