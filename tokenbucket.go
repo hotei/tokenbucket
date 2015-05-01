@@ -1,6 +1,6 @@
 // tokenbucket.go (c) 2014 David Rook - all rights reserved
 //
-// see README-tokenbucket.md
+// see README-tokenbucket-pkg.md
 //  also http://en.wikipedia.org/wiki/Token_bucket
 package tokenbucket
 
@@ -32,8 +32,6 @@ func New(fillTime time.Duration, capacity float64) *TokenBucket {
 	tb.capacity = capacity
 	tb.lastCount = capacity
 	tb.lastCheckTime = time.Now()
-	var lock sync.Mutex
-	tb.lock = lock
 	return &tb
 }
 
